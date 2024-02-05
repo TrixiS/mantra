@@ -3,6 +3,8 @@ package commands
 import (
 	"fmt"
 
+	sshclient "github.com/helloyi/go-sshclient"
+
 	"github.com/TrixiS/mantra/pkg/command_context"
 	"github.com/TrixiS/mantra/pkg/models"
 	"github.com/rodaine/table"
@@ -19,6 +21,7 @@ func Add(ctx *command_context.CommandContext) error {
 	return nil
 }
 
+// TODO: remove by name as well
 func Remove(ctx *command_context.CommandContext) error {
 	connectionId := ctx.CLIContext.Int("id")
 
@@ -45,5 +48,33 @@ func List(ctx *command_context.CommandContext) error {
 	}
 
 	t.Print()
+	return nil
+}
+
+func Connect(ctx *command_context.CommandContext) error {
+	connectionId := ctx.CLIContext.Int("id")
+
+	var connection models.Connection
+
+	if err := ctx.Provider.DB.One("ID", connectionId, &connection); err != nil {
+		return err
+	}
+
+	client, err := sshclient.DialWithPasswd(
+		fmt.Sprintf("%s:%d", connection.Host, connection.Port),
+		connection.User,
+		connection.Password,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	defer client.Close()
+
+	if err := client.Terminal(nil).Start(); err != nil {
+		return err
+	}
+
 	return nil
 }

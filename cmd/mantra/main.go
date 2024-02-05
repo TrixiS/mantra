@@ -22,7 +22,6 @@ import (
 const DBFilename = "mantra.db"
 
 func main() {
-	// TODO: use executable location
 	exPath, err := os.Executable()
 
 	if err != nil {
@@ -88,6 +87,19 @@ func main() {
 					},
 				},
 				Action: contextProvider.Wraps(commands.Remove),
+			},
+			// TODO: store id flag in a var
+			{
+				Name:    "connect",
+				Aliases: []string{"conn", "c"},
+				Usage:   "Connect to SSH",
+				Flags: []cli.Flag{
+					&cli.IntFlag{
+						Name:     "id",
+						Required: true,
+					},
+				},
+				Action: contextProvider.Wraps(commands.Connect),
 			},
 		},
 	}

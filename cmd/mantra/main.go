@@ -10,6 +10,7 @@ import (
 	"github.com/TrixiS/mantra/pkg/commands"
 	"github.com/asdine/storm/v3"
 	"github.com/urfave/cli/v2"
+	"golang.design/x/clipboard"
 )
 
 // TODO: subcommands file which would contain functions for each subcommand (or structs?)
@@ -22,6 +23,10 @@ import (
 const DBFilename = "mantra.db"
 
 func main() {
+	if err := clipboard.Init(); err != nil {
+		log.Fatal(err)
+	}
+
 	exPath, err := os.Executable()
 
 	if err != nil {

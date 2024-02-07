@@ -2,12 +2,14 @@ package commands
 
 import (
 	"fmt"
-
-	sshclient "github.com/helloyi/go-sshclient"
+	"os"
+	"os/exec"
+	"strconv"
 
 	"github.com/TrixiS/mantra/pkg/command_context"
 	"github.com/TrixiS/mantra/pkg/models"
 	"github.com/rodaine/table"
+	"golang.design/x/clipboard"
 )
 
 func Add(ctx *command_context.CommandContext) error {
@@ -60,19 +62,19 @@ func Connect(ctx *command_context.CommandContext) error {
 		return err
 	}
 
-	client, err := sshclient.DialWithPasswd(
-		fmt.Sprintf("%s:%d", connection.Host, connection.Port),
-		connection.User,
-		connection.Password,
+	command := exec.Command(
+		"ssh",
+		"-p", strconv.Itoa(int(connection.Port)),
+		fmt.Sprintf("%s@%s", connection.User, connection.Host),
+		// fmt.Sprintf("-p %d %s@%s", connection.Port, connection.User, connection.Host),
 	)
 
-	if err != nil {
-		return err
-	}
+	command.Stdin = os.Stdin
+	command.Stdout = os.Stdout
 
-	defer client.Close()
+	clipboard.Write(clipboard.FmtText, []byte(connection.Password))
 
-	if err := client.Terminal(nil).Start(); err != nil {
+	if err := command.Run(); err != nil {
 		return err
 	}
 

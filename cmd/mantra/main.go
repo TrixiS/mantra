@@ -13,13 +13,6 @@ import (
 	"golang.design/x/clipboard"
 )
 
-// TODO: subcommands file which would contain functions for each subcommand (or structs?)
-// TODO: add/remove commands to add ssh connections
-// TODO: aliases like mantra a / mantra rm
-// TODO: mantra list
-// TODO: mantra conn [id or name of a connection]
-// TODO: boltdb as a data store
-
 const DBFilename = "mantra.db"
 
 func main() {

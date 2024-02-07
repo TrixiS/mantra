@@ -66,7 +66,6 @@ func Connect(ctx *command_context.CommandContext) error {
 		"ssh",
 		"-p", strconv.Itoa(int(connection.Port)),
 		fmt.Sprintf("%s@%s", connection.User, connection.Host),
-		// fmt.Sprintf("-p %d %s@%s", connection.Port, connection.User, connection.Host),
 	)
 
 	command.Stdin = os.Stdin

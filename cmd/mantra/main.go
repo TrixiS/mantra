@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"path"
@@ -17,25 +18,25 @@ const DBFilename = "mantra.db"
 
 func main() {
 	if err := clipboard.Init(); err != nil {
-		log.Fatal(err)
+		log.Fatal(fmt.Errorf("clipboard init %w", err))
 	}
 
 	exPath, err := os.Executable()
 
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(fmt.Errorf("get current exe %w", err))
 	}
-
-	db, err := storm.Open(path.Join(filepath.Dir(exPath), DBFilename))
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer db.Close()
 
 	contextProvider := &command_context.CommandContextProvider{
-		DB: db,
+		DBFactory: func() *storm.DB {
+			db, err := storm.Open(path.Join(filepath.Dir(exPath), DBFilename))
+
+			if err != nil {
+				log.Fatal(fmt.Errorf("open db %w", err))
+			}
+
+			return db
+		},
 	}
 
 	app := &cli.App{

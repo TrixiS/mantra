@@ -14,8 +14,11 @@ import (
 
 func Add(ctx *command_context.CommandContext) error {
 	connection := models.NewConnectionFromCLIArgs(ctx.CLIContext)
+	db := ctx.Provider.DBFactory()
 
-	if err := ctx.Provider.DB.Save(connection); err != nil {
+	defer db.Close()
+
+	if err := db.Save(connection); err != nil {
 		return err
 	}
 
@@ -26,8 +29,11 @@ func Add(ctx *command_context.CommandContext) error {
 // TODO: remove by name as well
 func Remove(ctx *command_context.CommandContext) error {
 	connectionId := ctx.CLIContext.Int("id")
+	db := ctx.Provider.DBFactory()
 
-	if err := ctx.Provider.DB.DeleteStruct(&models.Connection{ID: connectionId}); err != nil {
+	defer db.Close()
+
+	if err := db.DeleteStruct(&models.Connection{ID: connectionId}); err != nil {
 		return err
 	}
 
@@ -37,9 +43,12 @@ func Remove(ctx *command_context.CommandContext) error {
 
 // TODO: an ability to show the table with passwords monkaS
 func List(ctx *command_context.CommandContext) error {
+	db := ctx.Provider.DBFactory()
+	defer db.Close()
+
 	var connections []models.Connection
 
-	if err := ctx.Provider.DB.All(&connections); err != nil {
+	if err := db.All(&connections); err != nil {
 		return err
 	}
 
@@ -53,14 +62,20 @@ func List(ctx *command_context.CommandContext) error {
 	return nil
 }
 
+// TODO: connect by name (use just first arg)
+// TODO: autocomplete for connection names
 func Connect(ctx *command_context.CommandContext) error {
 	connectionId := ctx.CLIContext.Int("id")
+	db := ctx.Provider.DBFactory()
 
 	var connection models.Connection
 
-	if err := ctx.Provider.DB.One("ID", connectionId, &connection); err != nil {
-		return err
+	if err := db.One("ID", connectionId, &connection); err != nil {
+		db.Close()
+		return fmt.Errorf("connection %w", err)
 	}
+
+	db.Close()
 
 	command := exec.Command(
 		"ssh",
@@ -74,7 +89,7 @@ func Connect(ctx *command_context.CommandContext) error {
 	clipboard.Write(clipboard.FmtText, []byte(connection.Password))
 
 	if err := command.Run(); err != nil {
-		return err
+		return fmt.Errorf("run ssh %w", err)
 	}
 
 	return nil

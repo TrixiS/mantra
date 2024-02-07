@@ -6,7 +6,7 @@ import (
 )
 
 type CommandContextProvider struct {
-	DB *storm.DB
+	DBFactory func() *storm.DB
 }
 
 func (provider *CommandContextProvider) Wraps(f CommandFunc) cli.ActionFunc {

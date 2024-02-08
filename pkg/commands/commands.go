@@ -9,6 +9,7 @@ import (
 	"github.com/TrixiS/mantra/pkg/command_context"
 	"github.com/TrixiS/mantra/pkg/models"
 	"github.com/asdine/storm/v3"
+	"github.com/fatih/color"
 	"github.com/rodaine/table"
 	"golang.design/x/clipboard"
 )
@@ -41,6 +42,7 @@ func Remove(ctx *command_context.CommandContext) error {
 	return nil
 }
 
+// TODO: write own simple table or use more useful one
 func List(ctx *command_context.CommandContext) error {
 	db := ctx.Provider.DBFactory()
 	defer db.Close()
@@ -51,7 +53,12 @@ func List(ctx *command_context.CommandContext) error {
 		return err
 	}
 
-	t := table.New("ID", "Name", "Host", "Port", "User")
+	headerColor := color.New(color.FgBlue, color.Underline).SprintfFunc()
+	idColor := color.New(color.FgBlue, color.Bold).SprintfFunc()
+
+	t := table.New("ID", "Name", "Host", "Port", "User").
+		WithHeaderFormatter(headerColor).
+		WithFirstColumnFormatter(idColor)
 
 	for _, conn := range connections {
 		t.AddRow(conn.ID, conn.Name, conn.Host, conn.Port, conn.User)

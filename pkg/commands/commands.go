@@ -27,7 +27,6 @@ func Add(ctx *command_context.CommandContext) error {
 	return nil
 }
 
-// TODO: remove by name as well
 func Remove(ctx *command_context.CommandContext) error {
 	connectionId := ctx.CLIContext.Int("id")
 	db := ctx.Provider.DBFactory()
@@ -42,7 +41,6 @@ func Remove(ctx *command_context.CommandContext) error {
 	return nil
 }
 
-// TODO: reveal command to show password
 func List(ctx *command_context.CommandContext) error {
 	db := ctx.Provider.DBFactory()
 	defer db.Close()

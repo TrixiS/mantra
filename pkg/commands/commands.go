@@ -23,7 +23,7 @@ func Add(ctx *command_context.CommandContext) error {
 		return err
 	}
 
-	fmt.Printf("Connection %s added with ID %d\n", connection.Name, connection.ID)
+	fmt.Printf("connection %s added with ID %d\n", connection.Name, connection.ID)
 	return nil
 }
 
@@ -38,7 +38,7 @@ func Remove(ctx *command_context.CommandContext) error {
 		return err
 	}
 
-	fmt.Printf("Connection with ID %d has been removed\n", connectionId)
+	fmt.Printf("connection with ID %d has been removed\n", connectionId)
 	return nil
 }
 
@@ -91,6 +91,24 @@ func Connect(ctx *command_context.CommandContext) error {
 		return fmt.Errorf("ssh %w", err)
 	}
 
+	return nil
+}
+
+func Reveal(ctx *command_context.CommandContext) error {
+	connectionId := ctx.CLIContext.Int("id")
+
+	db := ctx.Provider.DBFactory()
+	defer db.Close()
+
+	var connection models.Connection
+
+	if err := db.One("ID", connectionId, &connection); err != nil {
+		return fmt.Errorf("connection %w", err)
+	}
+
+	clipboard.Write(clipboard.FmtText, []byte(connection.Password))
+
+	fmt.Printf("password for \"%s\" copied to your clipboard\n", connection.Name)
 	return nil
 }
 

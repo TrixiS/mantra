@@ -39,6 +39,11 @@ func main() {
 		},
 	}
 
+	connectionIDFlag := &cli.IntFlag{
+		Name:     "id",
+		Required: true,
+	}
+
 	app := &cli.App{
 		Commands: []*cli.Command{
 			{
@@ -79,13 +84,8 @@ func main() {
 				Name:    "remove",
 				Aliases: []string{"rm"},
 				Usage:   "Remove a connection",
-				Flags: []cli.Flag{
-					&cli.IntFlag{
-						Name:     "id",
-						Required: true,
-					},
-				},
-				Action: contextProvider.Wraps(commands.Remove),
+				Flags:   []cli.Flag{connectionIDFlag},
+				Action:  contextProvider.Wraps(commands.Remove),
 			},
 			// TODO: store id flag in a var
 			{
@@ -95,6 +95,13 @@ func main() {
 				Args:      true,
 				ArgsUsage: "<connection name or ID>",
 				Action:    contextProvider.Wraps(commands.Connect),
+			},
+			{
+				Name:    "reveal",
+				Aliases: []string{"pwd", "r"},
+				Usage:   "Copy connection password",
+				Flags:   []cli.Flag{connectionIDFlag},
+				Action:  contextProvider.Wraps(commands.Reveal),
 			},
 		},
 	}

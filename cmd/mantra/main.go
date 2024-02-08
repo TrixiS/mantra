@@ -87,7 +87,6 @@ func main() {
 				Flags:   []cli.Flag{connectionIDFlag},
 				Action:  contextProvider.Wraps(commands.Remove),
 			},
-			// TODO: store id flag in a var
 			{
 				Name:      "connect",
 				Aliases:   []string{"conn", "c"},

@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 	"path"
-	"path/filepath"
 
 	"github.com/TrixiS/mantra/pkg/command_context"
 	"github.com/TrixiS/mantra/pkg/commands"
@@ -14,22 +13,30 @@ import (
 	"golang.design/x/clipboard"
 )
 
-const DBFilename = "mantra.db"
+const MantraDirname = ".mantra"
+const MantraDBFilename = "mantra.db"
 
 func main() {
+	homeDir, err := os.UserHomeDir()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	mantraDirpath := path.Join(homeDir, MantraDirname)
+
+	if err := os.MkdirAll(mantraDirpath, 0777); err != nil {
+		log.Fatal(err)
+	}
+
 	if err := clipboard.Init(); err != nil {
 		log.Fatal(fmt.Errorf("clipboard init %w", err))
 	}
 
-	exPath, err := os.Executable()
-
-	if err != nil {
-		log.Fatal(fmt.Errorf("get current exe %w", err))
-	}
-
 	contextProvider := &command_context.CommandContextProvider{
 		DBFactory: func() *storm.DB {
-			db, err := storm.Open(path.Join(filepath.Dir(exPath), DBFilename))
+			dbFilepath := path.Join(mantraDirpath, MantraDBFilename)
+			db, err := storm.Open(dbFilepath)
 
 			if err != nil {
 				log.Fatal(fmt.Errorf("open db %w", err))

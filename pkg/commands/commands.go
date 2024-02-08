@@ -8,6 +8,7 @@ import (
 
 	"github.com/TrixiS/mantra/pkg/command_context"
 	"github.com/TrixiS/mantra/pkg/models"
+	"github.com/asdine/storm/v3"
 	"github.com/rodaine/table"
 	"golang.design/x/clipboard"
 )
@@ -41,7 +42,7 @@ func Remove(ctx *command_context.CommandContext) error {
 	return nil
 }
 
-// TODO: an ability to show the table with passwords monkaS
+// TODO: reveal command to show password
 func List(ctx *command_context.CommandContext) error {
 	db := ctx.Provider.DBFactory()
 	defer db.Close()
@@ -62,20 +63,18 @@ func List(ctx *command_context.CommandContext) error {
 	return nil
 }
 
-// TODO: connect by name (use just first arg)
-// TODO: autocomplete for connection names
 func Connect(ctx *command_context.CommandContext) error {
-	connectionId := ctx.CLIContext.Int("id")
-	db := ctx.Provider.DBFactory()
-
-	var connection models.Connection
-
-	if err := db.One("ID", connectionId, &connection); err != nil {
-		db.Close()
-		return fmt.Errorf("connection %w", err)
+	if ctx.CLIContext.NArg() < 1 {
+		return fmt.Errorf("specify connection name of id")
 	}
 
+	db := ctx.Provider.DBFactory()
+	connection, err := getConnectionByIdentifier(db, ctx.CLIContext.Args().First())
 	db.Close()
+
+	if err != nil {
+		return fmt.Errorf("connection %w", err)
+	}
 
 	command := exec.Command(
 		"ssh",
@@ -89,8 +88,26 @@ func Connect(ctx *command_context.CommandContext) error {
 	clipboard.Write(clipboard.FmtText, []byte(connection.Password))
 
 	if err := command.Run(); err != nil {
-		return fmt.Errorf("run ssh %w", err)
+		return fmt.Errorf("ssh %w", err)
 	}
 
 	return nil
+}
+
+func getConnectionByIdentifier(db *storm.DB, ident string) (*models.Connection, error) {
+	var connection models.Connection
+
+	id, err := strconv.Atoi(ident)
+
+	if err == nil {
+		if err := db.One("ID", id, &connection); err != nil {
+			return nil, err
+		}
+	} else {
+		if err := db.One("Name", ident, &connection); err != nil {
+			return nil, err
+		}
+	}
+
+	return &connection, nil
 }

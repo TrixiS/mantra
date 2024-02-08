@@ -89,16 +89,12 @@ func main() {
 			},
 			// TODO: store id flag in a var
 			{
-				Name:    "connect",
-				Aliases: []string{"conn", "c"},
-				Usage:   "Connect to SSH",
-				Flags: []cli.Flag{
-					&cli.IntFlag{
-						Name:     "id",
-						Required: true,
-					},
-				},
-				Action: contextProvider.Wraps(commands.Connect),
+				Name:      "connect",
+				Aliases:   []string{"conn", "c"},
+				Usage:     "Connect to SSH",
+				Args:      true,
+				ArgsUsage: "<connection name or ID>",
+				Action:    contextProvider.Wraps(commands.Connect),
 			},
 		},
 	}

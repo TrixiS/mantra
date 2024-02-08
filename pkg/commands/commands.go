@@ -65,7 +65,7 @@ func List(ctx *command_context.CommandContext) error {
 
 func Connect(ctx *command_context.CommandContext) error {
 	if ctx.CLIContext.NArg() < 1 {
-		return fmt.Errorf("specify connection name of id")
+		return fmt.Errorf("specify connection name or ID")
 	}
 
 	db := ctx.Provider.DBFactory()

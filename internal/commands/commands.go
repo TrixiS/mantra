@@ -6,8 +6,8 @@ import (
 	"os/exec"
 	"strconv"
 
-	"github.com/TrixiS/mantra/pkg/command_context"
-	"github.com/TrixiS/mantra/pkg/models"
+	"github.com/TrixiS/mantra/internal/command_context"
+	"github.com/TrixiS/mantra/internal/models"
 	"github.com/asdine/storm/v3"
 	"github.com/fatih/color"
 	"github.com/rodaine/table"

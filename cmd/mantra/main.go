@@ -6,8 +6,8 @@ import (
 	"os"
 	"path"
 
-	"github.com/TrixiS/mantra/pkg/command_context"
-	"github.com/TrixiS/mantra/pkg/commands"
+	"github.com/TrixiS/mantra/internal/command_context"
+	"github.com/TrixiS/mantra/internal/commands"
 	"github.com/asdine/storm/v3"
 	"github.com/urfave/cli/v2"
 	"golang.design/x/clipboard"

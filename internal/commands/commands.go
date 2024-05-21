@@ -9,8 +9,8 @@ import (
 	"github.com/TrixiS/mantra/internal/command_context"
 	"github.com/TrixiS/mantra/internal/models"
 	"github.com/asdine/storm/v3"
-	"github.com/fatih/color"
-	"github.com/rodaine/table"
+	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/jedib0t/go-pretty/v6/text"
 	"golang.design/x/clipboard"
 )
 
@@ -42,7 +42,6 @@ func Remove(ctx *command_context.CommandContext) error {
 	return nil
 }
 
-// TODO: write own simple table or use more useful one
 func List(ctx *command_context.CommandContext) error {
 	db := ctx.Provider.DBFactory()
 	defer db.Close()
@@ -53,18 +52,23 @@ func List(ctx *command_context.CommandContext) error {
 		return err
 	}
 
-	headerColor := color.New(color.FgBlue, color.Underline).SprintfFunc()
-	idColor := color.New(color.FgBlue, color.Bold).SprintfFunc()
-
-	t := table.New("ID", "Name", "Host", "Port", "User").
-		WithHeaderFormatter(headerColor).
-		WithFirstColumnFormatter(idColor)
+	t := table.NewWriter()
+	t.SetOutputMirror(os.Stdout)
+	t.AppendHeader(table.Row{"ID", "Name", "Host", "Port", "User"})
+	t.SetStyle(table.StyleLight)
+	t.Style().Options.SeparateRows = false
+	t.SetColumnConfigs([]table.ColumnConfig{
+		{
+			Name:   "ID",
+			Colors: text.Colors{text.Bold, text.FgHiCyan},
+		},
+	})
 
 	for _, conn := range connections {
-		t.AddRow(conn.ID, conn.Name, conn.Host, conn.Port, conn.User)
+		t.AppendRow(table.Row{conn.ID, conn.Name, conn.Host, conn.Port, conn.User})
 	}
 
-	t.Print()
+	t.Render()
 	return nil
 }
 

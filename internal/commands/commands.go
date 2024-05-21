@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
+	"strings"
 
 	"github.com/TrixiS/mantra/internal/command_context"
 	"github.com/TrixiS/mantra/internal/models"
@@ -85,12 +86,17 @@ func Connect(ctx *command_context.CommandContext) error {
 		return fmt.Errorf("connection %w", err)
 	}
 
-	command := exec.Command(
-		"ssh",
-		"-p", strconv.Itoa(int(connection.Port)),
-		fmt.Sprintf("%s@%s", connection.User, connection.Host),
-	)
+	connectionArgs := strings.Split(connection.Args, " ")
 
+	execArgs := make([]string, len(connectionArgs)+2)
+	execArgs[0] = fmt.Sprintf("-p %d", connection.Port)
+	execArgs[1] = fmt.Sprintf("%s@%s", connection.User, connection.Host)
+
+	for i, arg := range connectionArgs {
+		execArgs[i+2] = arg
+	}
+
+	command := exec.Command("ssh", execArgs...)
 	command.Stdin = os.Stdin
 	command.Stdout = os.Stdout
 

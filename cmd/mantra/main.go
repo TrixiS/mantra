@@ -78,6 +78,10 @@ func main() {
 						Name:     "password",
 						Required: true,
 					},
+					&cli.StringFlag{
+						Name:     "args",
+						Required: false,
+					},
 				},
 				Action: contextProvider.Wraps(commands.Add),
 			},
@@ -95,12 +99,11 @@ func main() {
 				Action:  contextProvider.Wraps(commands.Remove),
 			},
 			{
-				Name:      "connect",
-				Aliases:   []string{"conn", "c"},
-				Usage:     "Connect to SSH",
-				Args:      true,
-				ArgsUsage: "<connection name or ID>",
-				Action:    contextProvider.Wraps(commands.Connect),
+				Name:    "connect",
+				Aliases: []string{"conn", "c"},
+				Usage:   "Connect to SSH",
+				Args:    true,
+				Action:  contextProvider.Wraps(commands.Connect),
 			},
 			{
 				Name:    "reveal",

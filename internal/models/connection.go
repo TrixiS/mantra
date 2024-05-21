@@ -9,6 +9,7 @@ type Connection struct {
 	Port     uint
 	User     string
 	Password string
+	Args     string
 }
 
 func NewConnectionFromCLIArgs(ctx *cli.Context) *Connection {
@@ -18,5 +19,6 @@ func NewConnectionFromCLIArgs(ctx *cli.Context) *Connection {
 		Port:     ctx.Uint("port"),
 		User:     ctx.String("user"),
 		Password: ctx.String("password"),
+		Args:     ctx.String("args"),
 	}
 }

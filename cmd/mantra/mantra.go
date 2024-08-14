@@ -104,6 +104,7 @@ func main() {
 				Usage:   "Connect to SSH",
 				Args:    true,
 				Action:  contextProvider.Wraps(commands.Connect),
+				Flags:   []cli.Flag{&cli.BoolFlag{Name: "sftp"}},
 			},
 			{
 				Name:    "reveal",
@@ -111,6 +112,20 @@ func main() {
 				Usage:   "Copy connection password",
 				Flags:   []cli.Flag{connectionIDFlag},
 				Action:  contextProvider.Wraps(commands.Reveal),
+			},
+			{
+				Name:  "update",
+				Usage: "Update connection data",
+				Flags: []cli.Flag{
+					connectionIDFlag,
+					&cli.StringFlag{Name: "name", Required: false},
+					&cli.StringFlag{Name: "host", Required: false},
+					&cli.UintFlag{Name: "port", Required: false},
+					&cli.StringFlag{Name: "user", Required: false},
+					&cli.StringFlag{Name: "password", Required: false},
+					&cli.StringFlag{Name: "args", Required: false},
+				},
+				Action: contextProvider.Wraps(commands.Update),
 			},
 		},
 	}

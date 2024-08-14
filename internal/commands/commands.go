@@ -86,17 +86,24 @@ func Connect(ctx *command_context.CommandContext) error {
 		return fmt.Errorf("connection %w", err)
 	}
 
+	cmd := "ssh"
 	connectionArgs := strings.Split(connection.Args, " ")
-
 	execArgs := make([]string, len(connectionArgs)+2)
-	execArgs[0] = fmt.Sprintf("-p %d", connection.Port)
+
+	if ctx.CLIContext.Bool("sftp") {
+		cmd = "sftp"
+		execArgs[0] = fmt.Sprintf("-P %d", connection.Port)
+	} else {
+		execArgs[0] = fmt.Sprintf("-p %d", connection.Port)
+	}
+
 	execArgs[1] = fmt.Sprintf("%s@%s", connection.User, connection.Host)
 
 	for i, arg := range connectionArgs {
 		execArgs[i+2] = arg
 	}
 
-	command := exec.Command("ssh", execArgs...)
+	command := exec.Command(cmd, execArgs...)
 	command.Stdin = os.Stdin
 	command.Stdout = os.Stdout
 
@@ -124,6 +131,46 @@ func Reveal(ctx *command_context.CommandContext) error {
 	clipboard.Write(clipboard.FmtText, []byte(connection.Password))
 
 	fmt.Printf("password for \"%s\" copied to your clipboard\n", connection.Name)
+	return nil
+}
+
+func Update(ctx *command_context.CommandContext) error {
+	connectionId := ctx.CLIContext.Int("id")
+
+	db := ctx.Provider.DBFactory()
+	defer db.Close()
+
+	var connection models.Connection
+
+	if err := db.One("ID", connectionId, &connection); err != nil {
+		return fmt.Errorf("connection %w", err)
+	}
+
+	if ctx.CLIContext.IsSet("name") {
+		connection.Name = ctx.CLIContext.String("name")
+	}
+
+	if ctx.CLIContext.IsSet("host") {
+		connection.Host = ctx.CLIContext.String("host")
+	}
+
+	if ctx.CLIContext.IsSet("port") {
+		connection.Port = ctx.CLIContext.Uint("port")
+	}
+
+	if ctx.CLIContext.IsSet("password") {
+		connection.Password = ctx.CLIContext.String("password")
+	}
+
+	if ctx.CLIContext.IsSet("args") {
+		connection.Args = ctx.CLIContext.String("args")
+	}
+
+	if err := db.Update(&connection); err != nil {
+		return fmt.Errorf("update connection %w", err)
+	}
+
+	fmt.Printf("updated \"%s\"\n", connection.Name)
 	return nil
 }
 

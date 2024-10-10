@@ -6,8 +6,8 @@ import (
 	"os"
 	"path"
 
-	"github.com/TrixiS/mantra/internal/command_context"
-	"github.com/TrixiS/mantra/internal/commands"
+	"github.com/TrixiS/mantra/internal/mantra/command_context"
+	"github.com/TrixiS/mantra/internal/mantra/commands"
 	"github.com/asdine/storm/v3"
 	"github.com/urfave/cli/v2"
 	"golang.design/x/clipboard"
@@ -104,7 +104,12 @@ func main() {
 				Usage:   "Connect to SSH",
 				Args:    true,
 				Action:  contextProvider.Wraps(commands.Connect),
-				Flags:   []cli.Flag{&cli.BoolFlag{Name: "sftp"}},
+				Flags: []cli.Flag{
+					&cli.BoolFlag{
+						Name:    "sftp",
+						Aliases: []string{"ftp"},
+					},
+				},
 			},
 			{
 				Name:    "reveal",

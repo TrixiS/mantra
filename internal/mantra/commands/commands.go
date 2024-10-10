@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/TrixiS/mantra/internal/command_context"
-	"github.com/TrixiS/mantra/internal/models"
+	"github.com/TrixiS/mantra/internal/mantra/command_context"
+	"github.com/TrixiS/mantra/internal/mantra/models"
 	"github.com/asdine/storm/v3"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
@@ -162,6 +162,7 @@ func Update(ctx *command_context.CommandContext) error {
 		connection.Password = ctx.CLIContext.String("password")
 	}
 
+	// TODO: parse args by a parser to an array (or! just use multiple args as -a)
 	if ctx.CLIContext.IsSet("args") {
 		connection.Args = ctx.CLIContext.String("args")
 	}

@@ -132,6 +132,37 @@ func main() {
 				},
 				Action: contextProvider.Wraps(commands.Update),
 			},
+			{
+				Name:  "sync",
+				Usage: "Sync connections",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:    "address",
+						Aliases: []string{"a"},
+						Usage:   "Sync server url",
+					},
+					&cli.StringFlag{
+						Name:     "username",
+						Aliases:  []string{"u"},
+						Required: true,
+					},
+					&cli.StringFlag{
+						Name:     "password",
+						Aliases:  []string{"p"},
+						Required: true,
+					},
+				},
+				Subcommands: []*cli.Command{
+					{
+						Name:   "push",
+						Action: contextProvider.Wraps(commands.Push),
+					},
+					{
+						Name:   "pull",
+						Action: contextProvider.Wraps(commands.Pull),
+					},
+				},
+			},
 		},
 	}
 

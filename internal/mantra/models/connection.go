@@ -3,13 +3,13 @@ package models
 import "github.com/urfave/cli/v2"
 
 type Connection struct {
-	ID       int    `storm:"id,increment"`
-	Name     string `storm:"index"`
-	Host     string `storm:"index"`
-	Port     uint
-	User     string
-	Password string
-	Args     string
+	ID       int    `storm:"id,increment" json:"id"`
+	Name     string `storm:"index"        json:"name"`
+	Host     string `storm:"index"        json:"host"`
+	Port     uint   `                     json:"port"`
+	User     string `                     json:"user"`
+	Password string `                     json:"password"`
+	Args     string `                     json:"args"`
 }
 
 func NewConnectionFromCLIArgs(ctx *cli.Context) *Connection {

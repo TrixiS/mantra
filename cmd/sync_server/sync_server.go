@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"database/sql"
+	"database/sql/driver"
 	"fmt"
 	"log"
 
@@ -12,7 +14,7 @@ import (
 	"github.com/caarlos0/env/v10"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
-	_ "github.com/mattn/go-sqlite3"
+	sqlite "modernc.org/sqlite"
 )
 
 type config struct {
@@ -30,7 +32,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	db, err := ent.Open(dialect.SQLite, "file:database.sqlite3?_fk=1")
+	sql.Register("sqlite3", sqliteDriver{Driver: &sqlite.Driver{}})
+	db, err := ent.Open(dialect.SQLite, "file:database.sqlite3")
 
 	if err != nil {
 		log.Fatalf("db conn: %v", err)
@@ -60,4 +63,27 @@ func main() {
 	syncGroup.POST("/push", syncController.Push)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)))
+}
+
+type sqliteDriver struct {
+	*sqlite.Driver
+}
+
+func (d sqliteDriver) Open(name string) (driver.Conn, error) {
+	conn, err := d.Driver.Open(name)
+
+	if err != nil {
+		return conn, err
+	}
+
+	c := conn.(interface {
+		Exec(stmt string, args []driver.Value) (driver.Result, error)
+	})
+
+	if _, err := c.Exec("PRAGMA foreign_keys = on;", nil); err != nil {
+		conn.Close()
+		return nil, fmt.Errorf("failed to enable fk: %w", err)
+	}
+
+	return conn, nil
 }

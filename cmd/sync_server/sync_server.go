@@ -59,7 +59,6 @@ func main() {
 
 	syncGroup := e.Group("/sync", mw.NewSyncAuthMiddleware(db))
 	syncGroup.GET("/pull", syncController.Pull)
-	syncGroup.GET("/pull", syncController.Pull)
 	syncGroup.POST("/push", syncController.Push)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)))

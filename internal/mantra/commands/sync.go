@@ -37,6 +37,11 @@ func Push(ctx *command_context.CommandContext) error {
 		return err
 	}
 
+	if len(connectionModels) == 0 {
+		fmt.Println("nothing to push")
+		return nil
+	}
+
 	connectionsJSON, err := json.Marshal(connectionModels)
 
 	if err != nil {

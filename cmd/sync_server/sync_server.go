@@ -14,7 +14,7 @@ import (
 	"github.com/caarlos0/env/v10"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
-	sqlite "modernc.org/sqlite"
+	"modernc.org/sqlite"
 )
 
 type config struct {
@@ -57,7 +57,7 @@ func main() {
 		DB: db,
 	}
 
-	syncGroup := e.Group("/sync", mw.NewSyncAuthMiddleware(db))
+	syncGroup := e.Group("/sync", mw.NewPasswordAuthMiddleware(db))
 	syncGroup.GET("/pull", syncController.Pull)
 	syncGroup.POST("/push", syncController.Push)
 

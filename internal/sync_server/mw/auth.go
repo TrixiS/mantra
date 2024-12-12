@@ -22,7 +22,7 @@ func NewSecretAuthMiddleware(secret string) echo.MiddlewareFunc {
 	}
 }
 
-func NewSyncAuthMiddleware(db *ent.Client) echo.MiddlewareFunc {
+func NewPasswordAuthMiddleware(db *ent.Client) echo.MiddlewareFunc {
 	return middleware.BasicAuth(
 		func(username string, password string, c echo.Context) (bool, error) {
 			usr, err := db.User.Query().

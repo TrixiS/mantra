@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"database/sql"
-	"fmt"
 	"net/http"
 
 	"github.com/TrixiS/mantra/ent"
@@ -51,7 +50,6 @@ func (s *SyncController) Push(c echo.Context) error {
 	var connectionModels []models.Connection
 
 	if err := c.Bind(&connectionModels); err != nil {
-		fmt.Println(err)
 		return err
 	}
 
